@@ -26,18 +26,26 @@ void main(int argc, char **argv){
 		write(1, buffer, strlen(buffer));
 }
 */
-void main(int argc, char** argv){
+int main(int argc, char** argv){
 int x;
 char buffer[256];
 
-	while( (( x = read(0,buffer,256)) > 0)){
-		strcpy(&buffer[x-1], ":");
-		strcat(buffer, argv[1]);
-		strcat(buffer, "\n");
+	if(argc == 2){
+    	
+		while( (( x = read(0,buffer,256)) > 0)){
+			strcpy(&buffer[x-1], ":");
+			strcat(buffer, argv[1]);
+			strcat(buffer, "\n");
 
-		write(1,buffer,strlen(buffer));
+			write(1,buffer,strlen(buffer));
 		
-
+		}
 	}
 
+	else{
+		write(1, "Too many or very few arguments!\n", 32);
+		return EXIT_FAILURE;
+	}
+
+return EXIT_SUCCESS;
 }
