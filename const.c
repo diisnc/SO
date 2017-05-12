@@ -3,28 +3,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-//argv[0] = const
-//argv[1] = valor
-//nao é preciso ciclo, depois o processor geral é q chama mts vezes
-
-
 /*
-void main(int argc, char **argv){ 
-	int x, i=0;
-	char buffer[256];
-
-		do{
-			x=read(0, &buffer[i], 1);
-			i++;
-		}
-		while( x>0 && buffer[i-1]!='\n' );
-
-		strcpy(&buffer[i-1], ":");
-		strcat(buffer, argv[1]);
-		strcat(buffer,"\n");
-		write(1, buffer, strlen(buffer));
-}
+argv[0] = const
+argv[1] = valor
+nota: em vez de ler 256, tamanho vai ser PIPE_BUF
 */
 int main(int argc, char** argv){
 int x;
