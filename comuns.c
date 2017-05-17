@@ -28,8 +28,8 @@
  	int i, j;
 
  	while(buffer[i] != '\n'){
- 		for(i = 0; buffer[i]!=' '; i++){
- 		*string[i] = buffer[j];
+ 		for(i = 0, j =; buffer[i]!=' '; i++){
+ 		*string[i] = buffer[i];
  		}
  	*string[i] = '\0';
  	i++;

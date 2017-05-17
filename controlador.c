@@ -6,8 +6,9 @@
 #include <limits.h>
 #include "comuns.c"
 
+//faz um fork, cada fork faz 3 forks, um para o read, outro para o
+//write, outro para os execs e dups (ver imagem)
 void node(){
-//cria 2 filhos
 
 }
 void connect(){}
@@ -23,14 +24,15 @@ int main(int argc, char **argv){
 
 	while((tam = read_line(0, buffer, PIPE_BUF)) > 0){
 		*args = read_words(buffer);
-		for(int i = 0; i < 10; i++)
-		printf("%s", args[i]);
+		//for(int i = 0; i < 10; i++)
+		//printf("%s", args[i]);
 
 
 
 		
 		if( strcmp(args[0],"node") ){
-			//node();
+			
+			node();
 
 
 		}
