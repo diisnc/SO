@@ -87,9 +87,40 @@ int main(int argc, char **argv)
             i++;
         }
         printf("\n");
+        int r;
+        int x;
+        if((x=fork())==0){
+            x = execvp(argv[1],&argv[1]);
+            exit(x);
+        }
 
+        write(1,buffer,WEXITSTATUS(r));
 
     }
+
+    /*
+
+    
+//EX5-FICHA3
+void main(int argc, char** argv){
+int x, r;
+
+for(int i = 1; i < argc; i++){
+    if( (x=fork()) == 0 ){
+        printf("Criou o filho nmr %d\n", i);
+        execlp(argv[i], argv[i], NULL);
+        exit(i);
+    }
+}
+
+while(wait(&r)>0)//retorna -1 se n tiver sucesso, valor se for id do filho q acabou
+    printf("MENOS UM FILHO!! numero dele: %d", WEXITSTATUS(r));
+//é suposto dar sempre zero no codigo de saida, pq se faz o exec,
+//vai fazer o exit
+}
+
+
+    */
     
     printf("yyy3\n");
     return 0;
