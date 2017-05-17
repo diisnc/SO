@@ -9,7 +9,7 @@
 	 int endOfLine = 0, nbytes = 0;
    char c;
 
-	 while (!endOfLine && read(fd, &c, 1) == 1) {
+	 while (!endOfLine && read(fd, &c, 1) == 1 ) {
      if (nbytes < count)
        buf[nbytes] = c;
      nbytes++;

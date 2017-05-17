@@ -129,20 +129,20 @@ int main(int argc, const char *argv[]) {
     char buf[PIPE_BUF];
     long stack[nlines];
 
-    if (argc != 4) {
+/*  if (argc != 4) {
       write(1, "Too many or not enough arguments passed to the program.\n", 56);
       return EXIT_FAILURE;
-    }
-    if (!checkOP(operation)) {
+    }*/
+/*  if (!checkOP(operation)) {
       write(1, "The operation is not supported by this program. Try 'avg', 'max', 'min' or 'sum'.\n", 82);
       return EXIT_FAILURE;
-    }
+    }*/
     while (x = read_line(0, buf, PIPE_BUF)) {
       res = operate(stack, i, operation);
-      if (x + countDigits(res) + 2 > PIPE_BUF) {
+  /*  if (x + countDigits(res) + 2 > PIPE_BUF) {
         write(1, "The length of the newly created line exceeds PIPE_BUF and, therefore, is too long.\n", 83);
         return EXIT_FAILURE;
-      }
+      }*/
       ins = getVal(buf, ncol, &valCol);
       if (ins >= 0)
         i = stackOrg(stack, i, nlines, valCol);

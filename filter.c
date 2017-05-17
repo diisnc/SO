@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "readline.c"
 
 /*
 argv[0]=filter
@@ -29,8 +30,8 @@ int elemIndexInicial(char *buffer, int coluna){
 
 
 	for( i = 0; i < tam && (two_dots < (coluna-1) ) ; i++){
-				
-		if(buffer[i] == ':') 
+
+		if(buffer[i] == ':')
 			two_dots++;
 	}
 
@@ -50,7 +51,7 @@ int elem_column(char *buffer, int tamanho, int index){
 	int first_index = elemIndexInicial(buffer, index);
 	char guarda_elem[PIPE_BUF];
 	int i = 0;
-	
+
 	if(first_index == -1)
 		return -1;
 
@@ -79,6 +80,7 @@ char buffer[PIPE_BUF];
 		char* op = argv[2];
 
 
+
 		//if( index_col1 <=0 || index_col2 <= 0 ){
 		//	write(1, "Columns numbers can't be zero or less!\n", 38);
 		//	return EXIT_FAILURE;
@@ -92,7 +94,7 @@ char buffer[PIPE_BUF];
 
 
 
-		while( (( tamanho = read(0,buffer,256)) > 0)){
+		while( (( tamanho = read_line(0, buffer, PIPE_BUF)) > 0)){
 			int elem1 = elem_column(buffer, tamanho, index_col1); //conteudo coluna argv[1]
 			int elem2 = elem_column(buffer, tamanho, index_col2); //conteudo coluna argv[3]
 
@@ -147,12 +149,14 @@ char buffer[PIPE_BUF];
 					write(1, buffer, tamanho);
 			}
 		}
+
 	//}
 	
 	//else{
 	//	write(1, "Too many or very few arguments!\n", 32);
 	//	return EXIT_FAILURE;
 	//}
+
 
 
 return EXIT_SUCCESS;
