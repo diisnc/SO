@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 #include "readline.c"
 
 /*
@@ -86,7 +87,7 @@ char buffer[PIPE_BUF];
 		//	return EXIT_FAILURE;
 		//}
 
-		
+
 		//if( (strcmp(op, "<")!=0) && (strcmp(op, ">")!=0) && (strcmp(op, "<=")!=0) && (strcmp(op, ">=")!=0) && (strcmp(op, "=")!=0) && (strcmp(op, "!=")!=0) ){
 		//	write(1, "Invalid operator!\n", 18);
 		//	return EXIT_FAILURE;
@@ -151,7 +152,7 @@ char buffer[PIPE_BUF];
 		}
 
 	//}
-	
+
 	//else{
 	//	write(1, "Too many or very few arguments!\n", 32);
 	//	return EXIT_FAILURE;
