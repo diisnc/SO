@@ -23,6 +23,8 @@ int main(int argc, char **argv){
 
 	while((tam = read_line(0, buffer, PIPE_BUF)) > 0){
 		*args = read_words(buffer);
+		for(int i = 0; i < 10; i++)
+		printf("%s", args[i]);
 
 
 

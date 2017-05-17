@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
-#include "readline.c"
+#include "comuns.c"
 /*
 argv[0] = const
 argv[1] = valor

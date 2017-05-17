@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "readline.c"
+#include "comuns.c"
 
 /*
 argv[0]=filter
