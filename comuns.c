@@ -21,15 +21,17 @@
 	 return nbytes;
  }
 
- 
+
  char* read_words(char *buffer){
  	char c;
- 	char **string = malloc(sizeof(char)*10);
- 	int i, j;
+ 	char **strings = malloc(sizeof(char)*10);
+  char *word;
+  int i = 0, j;
 
- 	while(buffer[i] != '\n'){
- 		for(i = 0; buffer[i]!=' '; i++){
- 		*string[i] = buffer[j];
+ 	while (buffer[i] != '\n') {
+    word = malloc(sizeof(char)*40);
+ 		for (j = 0; buffer[i] != ' '; i++) {
+ 		word[j] = buffer[i];
  		}
  	*string[i] = '\0';
  	i++;
