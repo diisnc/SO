@@ -33,10 +33,10 @@
  		for (j = 0; buffer[i] != ' '; i++) {
  		word[j] = buffer[i];
  		}
- 	*string[i] = '\0';
+ 	*strings[i] = '\0';
  	i++;
  	}
 
- 	return *string;
+ 	return *strings;
 
 }
