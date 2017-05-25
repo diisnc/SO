@@ -41,6 +41,8 @@ int node(int node_ID, char* node_ID1, char* cmd, char** args){
 		mkfifo( strcat("fifo_out", node_ID1) , 666); //fifo de saida
 		int fd_in[2]; //pipe anonimo
 		int fd_out[2]; //pipe anonimo
+		//pipe(fd_in);
+		//pipe(fd_out);
 
 		
 		/*---criaçao dos 3 filhos----*/
