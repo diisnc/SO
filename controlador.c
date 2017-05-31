@@ -41,12 +41,12 @@ int node(int node_ID, char* node_ID1, char* cmd, char** args){
 		mkfifo( strcat("fifo_out", node_ID1) , 666); //fifo de saida
 		int fd_in[2]; //pipe anonimo
 		int fd_out[2]; //pipe anonimo
-		//pipe(fd_in);
-		//pipe(fd_out);
+		pipe(fd_in);
+		pipe(fd_out);
 
-		
+
 		/*---criaçao dos 3 filhos----*/
-		int read_id = fork(); 
+		int read_id = fork();
 		int write_id = fork();
 		int dupexec_id = fork();
 		/*--------------------------*/
@@ -55,7 +55,7 @@ int node(int node_ID, char* node_ID1, char* cmd, char** args){
 		if(!read_id){//fork de leitura
 			close(fd_in[0]); //fechar pipe anon p leitura. vou
 						  //ler apenas e depois escrever
-						  //para pipe anon 
+						  //para pipe anon
 
 
 			int fich_i = open( strcat("fifo_in", node_ID1) , O_RDONLY);//abrir fifo de entrada
@@ -105,9 +105,9 @@ int node(int node_ID, char* node_ID1, char* cmd, char** args){
 /*
 Sempre q houver um connect entre 2 nodos, vai haver um "intermediário"
 ou seja, um pipe a ligar(no caso de 2 nodos) a saida do primeiro
-À entrada do segundo (node). só fiz isto para no caso de haver uma ligaçao de 
+À entrada do segundo (node). só fiz isto para no caso de haver uma ligaçao de
 mts nodos, isto vai ser preciso.
-Depois, no disconnect, é só fazer close? do intermediario e criar outro c 
+Depois, no disconnect, é só fazer close? do intermediario e criar outro c
 menos ligacoes
 
 
@@ -123,10 +123,10 @@ void connect(char* node_ID1, char* node_ID2){
 
 	int fdi = open( strcat("fifo_out", node_ID1), O_RDONLY);//abrir saida do primeiro(read)
 	int fdo = open( strcat("fifo_in", node_ID2), O_WRONLY);//mandar para entrada do segundo(write)
-	
+
 	mkfifo("conector", 666);
 	int fdc = open("conector", O_RDONLY | O_WRONLY);
-	
+
 	int x; char buffer[PIPE_BUF];
 	while( (x=read_line(fdi, buffer , 1)) > 0 ){
 		write(fdc, buffer , x);
@@ -152,16 +152,16 @@ int main(int argc, char **argv){
 
 	//inicializar os arrays globais a 0 ou -1(fazer)
 
-	while((tam = read_line(0, buffer, PIPE_BUF)) > 0){ //le um comando de cada vez
+	while(read_line(0, buffer, PIPE_BUF) > 0){ //le um comando de cada vez
 		*args = read_words(buffer);
 		//for(int i = 0; i < 10; i++)
 		//printf("%s", args[i]);
 
 
 
-		
+
 		if( (strcmp(args[0],"node")) == 0 ){
-			
+
 			//estou a passar 2x o args[1] id do node pq vou precisar, ver funcao
 			node(atoi(args[1]),args[1], args[2], &args[3]); //&args[3] funciona???
 			//args[0] node
@@ -171,18 +171,18 @@ int main(int argc, char **argv){
 
 
 		}
-		
-		else	
-		
-			if( (strcmp(args[0],"connect")) == 0 ){}
-		
-		else	
-		
-			if( (strcmp(args[0],"disconnect")) == 0 ){}
-		
+
 		else
-		
-			if( (strcmp(args[0],"inject")) == 0 ){}	
+
+			if( (strcmp(args[0],"connect")) == 0 ){}
+
+		else
+
+			if( (strcmp(args[0],"disconnect")) == 0 ){}
+
+		else
+
+			if( (strcmp(args[0],"inject")) == 0 ){}
 
 
 
