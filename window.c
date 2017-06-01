@@ -1,19 +1,20 @@
-#include <unistd.h> /* chamadas ao sistema: defs e decls essenciais */
+#include <unistd.h>   /* chamadas ao sistema: defs e decls essenciais */
 #include <sys/wait.h> /* chamadas wait*() e macros relacionadas */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
+#include "auxs.h"
 
 int getVal(char *line, int coluna, long *val){
 
-  int two_dots = 0, reachEnd = 0, idx = 0, i;
-  int size = strlen(line);
-  char saved_elem[21];   /*20 dígitos do maior unsigned int representável em 64 bits mais 1 do \0.*/
+    int two_dots = 0, reachEnd = 0, idx = 0, i;
+    int size = strlen(line);
+    char saved_elem[21];   /*20 dígitos do maior unsigned int representável em 64 bits mais 1 do \0.*/
 
-  for (idx = 0; idx < size && (two_dots < (coluna-1)); idx++)
-    if(line[idx] == ':')
-      two_dots++;
+    for (idx = 0; idx < size && (two_dots < (coluna-1)); idx++)
+      if(line[idx] == ':')
+        two_dots++;
 
     if (idx == size)
       reachEnd = 1;
@@ -29,85 +30,72 @@ int getVal(char *line, int coluna, long *val){
 
 int stackOrg(long *stack, int i, int nlines, long valCol) {
 
-  if (i == nlines) {
-    nlines--;
-    while (nlines > 0) {
-      stack[nlines-1] = stack[nlines];
+    if (i == nlines) {
       nlines--;
+      while (nlines > 0) {
+        stack[nlines-1] = stack[nlines];
+        nlines--;
+      }
+      stack[i-1] = valCol;
     }
-    stack[i-1] = valCol;
-  }
-  else {
-    stack[i] = valCol;
-    i++;
-  }
+    else {
+      stack[i] = valCol;
+      i++;
+    }
 
-  return i;
+    return i;
 }
 
 int countDigits(long n){
 
-  int count = 0;
+    int count = 0;
 
-  if (n <= 0){     // contar o sinal -
-    count++;
-  }
+    if (n <= 0){     // contar o sinal -
+      count++;
+    }
 
-  while(n != 0){
-    n /= 10;    // n = n/10
-    count++;
-  }
+    while(n != 0) {
+      n /= 10;    // n = n/10
+      count++;
+    }
 
-  return count;
+    return count;
 }
 
 long operate(long *stack, int i, const char* op){
 
-  int it = 0;
-  long res = 0;
+    int it = 0;
+    long res = 0;
 
-  if (i > 0) {
-    if (!strcmp(op, "avg")) {
-      for (; it < i; it++)
-        res += stack[it];
-      res /= i;
+    if (i > 0) {
+      if (!strcmp(op, "avg")) {
+        for (; it < i; it++)
+          res += stack[it];
+          res /= i;
+        }
+      else if (!strcmp(op, "sum"))
+        for (; it < i; it++)
+          res += stack[it];
+      else if (!strcmp(op, "max")) {
+        res = stack[0];
+        for (it = 1; it < i; it++)
+          if (stack[it] > res)
+            res = stack[it];
+      }
+      else if (!strcmp(op, "min")) {
+        res = stack[0];
+        for (it = 1; it < i; it++)
+          if (stack[it] < res)
+            res = stack[it];
+      }
     }
-    else if (!strcmp(op, "sum"))
-      for (; it < i; it++)
-        res += stack[it];
-    else if (!strcmp(op, "max")) {
-      res = stack[0];
-      for (it = 1; it < i; it++)
-        if (stack[it] > res)
-          res = stack[it];
-    }
-    else if (!strcmp(op, "min")) {
-      res = stack[0];
-      for (it = 1; it < i; it++)
-        if (stack[it] < res)
-          res = stack[it];
-    }
-  }
 
-  return res;
+    return res;
 }
 
 int checkOP(const char* op) {
 
-  return (!strcmp(op, "avg") || !strcmp(op, "max") || !strcmp(op, "min") || !strcmp(op, "sum"));
-}
-
-int read_line(int fd, char *buf, int count) {
-  int x, endOfLine = 0, nbytes = 0;
-  char c;
-  while (!endOfLine && read(fd, &c, 1) == 1) {
-    if (nbytes < count)
-      buf[nbytes++] = c;
-    if (c == '\n')
-      endOfLine = 1;
-  }
-  buf[nbytes] = '\0';
-  return nbytes;
+    return (!strcmp(op, "avg") || !strcmp(op, "max") || !strcmp(op, "min") || !strcmp(op, "sum"));
 }
 
 /*

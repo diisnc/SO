@@ -1,10 +1,10 @@
-#include <unistd.h> /* chamadas ao sistema: defs e decls essenciais */
+#include <unistd.h> 	/* chamadas ao sistema: defs e decls essenciais */
 #include <sys/wait.h> /* chamadas wait*() e macros relacionadas */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
-#include "comuns.c"
+#include "auxs.h"
 /*
 argv[0] = const
 argv[1] = valor
@@ -18,7 +18,7 @@ int main(int argc, char** argv){
 		//if (argc == 2) {
 
 			while (((x = read_line(0,buffer,PIPE_BUF)) > 0)) {
-				
+
 				if(argc == 2){
 
 				strcpy(&buffer[x-1], ":");
