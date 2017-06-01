@@ -15,6 +15,15 @@ int connects[500][500];
 //(...)
 
 
+/*
+--------------------------NOTA-------------------
+testes das componentes VER
+ou manter nas componentes, mas limpar buffer e dar para escrever outra
+vez(o programa n pode parar!)
+ou passar para o controlador, mas já n dá para sermos tão especificos...
+-------------------------------------------------
+*/
+
 
 
 //faz um fork,este fork faz 3 forks, um para o read, outro para o
