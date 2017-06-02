@@ -17,6 +17,7 @@ void node(char** args, pid_t nodes[]) {
     int fd_wr_in;
     int fd_rd_out;
     int fd_wr_out;
+    pid_t node_proc;
     pid_t rd_proc;
     pid_t exec_proc;
     ssize_t br;             /*br -> bytes read*/
@@ -38,37 +39,39 @@ void node(char** args, pid_t nodes[]) {
     mkfifo(in_node, 0660);
     mkfifo(out_node, 0660);
 
-    int fd_rd_in = open(in_node, O_RDONLY);    		 /*Abre o named pipe de entrada para leitura.*/
-    int fd_wr_out = open(out_node, O_WRONLY);  		 /*Abre o named pipe de saída para escrita.*/
+    fd_rd_in = open(in_node, O_RDONLY);    		 /*Abre o named pipe de entrada para leitura.*/
+    fd_wr_out = open(out_node, O_WRONLY);  		 /*Abre o named pipe de saída para escrita.*/
 
-    rd_proc = fork();                                                /*Criação de um processo de leitura dos dados que chegam ao node.*/
-    if (rd_proc == 0) {                                           	 /*Sendo 0, estamos no processo filho de leitura criado.*/
-      while (br = read_line(fd_rd_in, rd_wr_buf, PIPE_BUF) >= 0) {   /*A leitura dá-se quando o número de bytes lidos é maior ou igual a 0 de modo a que a rede não pare.*/
-        if (br > 0) {                                             	 /*Se for maior do que 0, estamos perante um evento, e dá-se uma execução.*/
-          write(feed_exec_fd[1], rd_wr_buf, br);
+    node_proc = fork();                                                /*Criação de um filho do processo principal, que será o processo correspondente ao nodo.*/
+    if (node_proc == 0) {                                              /*Sendo 0, estamos no processo filho do nodo criado.*/
+      rd_proc = fork();                                                /*Criação de um processo de leitura dos dados que chegam ao node.*/
+      if (rd_proc == 0) {                                           	 /*Sendo 0, estamos no processo filho de leitura criado.*/
+        while (br = read_line(fd_rd_in, rd_wr_buf, PIPE_BUF) >= 0) {   /*A leitura dá-se quando o número de bytes lidos é maior ou igual a 0 de modo a que a rede não pare.*/
+          if (br > 0)                                               	 /*Se for maior do que 0, estamos perante um evento, e dá-se uma execução.*/
+            write(feed_exec_fd[1], rd_wr_buf, br);
+        }
+      }
+      else if (rd_proc > 0) {                                 /*Sendo maior do que 0, estamos no processo pai, correspondente ao processo do nodo.*/
+        exec_proc = fork();                                   /*Criação de um processo de execução de um comando que chegou ao node.*/
+        if (exec_proc == 0) {                                 /*Sendo 0, estamos no processo filho de execução criado.*/
+          dup2(feed_exec_fd[0], 0);
+          dup2(out_exec_fd[1], 1);
+          if (!strcmp(args[2], "const") || !strcmp(args[2], "filter") || !strcmp(args[2], "window") || !strcmp(args[2], "spawn"))
+            execv(args[2], args+2);
+          else
+            execvp(args[2], args+2);
+        }
+        else if (exec_proc > 0) {                             /*Sendo maior do que 0, estamos ainda no processo pai, correspondente ao processo do nodo.*/
+          while (br = read_line(out_exec_fd[0], rd_wr_buf, PIPE_BUF) > 0)
+            write(fd_wr_out, rd_wr_buf, br);
         }
       }
     }
-    else if (rd_proc > 0) {                                 /*Sendo maior do que 0, estamos no processo pai, correspondente ao processo do nodo.*/
-      exec_proc = fork();                                   /*Criação de um processo de execução de um comando que chegou ao node.*/
-      if (exec_proc == 0) {                                 /*Sendo 0, estamos no processo filho de execução criado.*/
-				dup2(feed_exec_fd[0], 0);
-        dup2(out_exec_fd[1], 1);
-				if (strcmp(args[2], "const") == 0 || strcmp(args[2], "filter") == 0 || strcmp(args[2], "window") == 0 || strcmp(args[2], "spawn") == 0)	{
-        	execv(args[2], args+2);
-      	}
-        else
-          exevp(args[2], args+2);
-      else if (exec_proc > 0) {                             /*Sendo maior do que 0, estamos ainda no processo pai, correspondente ao processo do nodo.*/
-        while (br = read_line(out_exec_fd[0], rd_wr_buf, PIPE_BUF) > 0) {
-          write(fd_wr_out, rd_wr_buf, br);
-        }
-      }
-    }
-    /*Guardar info do nodo, com process IDs e ID do nodo em si numa estrutura, para que possa eliminar o nodo depois.*/
+    else
+      nodes[atoi(args[1])] = node_proc;
 }
 
-void connect(char *out, char *in, pid_t connections[][]) {
+void connect(char *out, char *in, pid_t connections[512][512]) {
 
     ssize_t br;
     pid_t connection;
@@ -97,7 +100,7 @@ void connect(char *out, char *in, pid_t connections[][]) {
     }
 }
 
-void disconnect(char** args, pid_t connections[][]) {
+void disconnect(char** args, pid_t connections[512][512]) {
 
     pid_t to_kill;
     int id_1 = atoi(args[1]);
@@ -107,6 +110,35 @@ void disconnect(char** args, pid_t connections[][]) {
       kill(to_kill, SIGTERM);   /*SIGTERM (15) - pede ao processo que termine. Poderia ser SIGKILL (9) que acaba logo com tudo.*/
       /*waitpid(to_kill, NULL, WEXITED)*/     /*Para termos a certeza de que o processo morreu. Com SIGKILL não seria necessário.*/
       connections[id_1][id_2] = 0;
+    }
+}
+
+void inject(char** args) {
+
+    pid_t exec;
+    int exec_com[2];
+    pipe(exec_com);
+    ssize_t br;
+    char buffer[PIPE_BUF];
+    char injection_node[28];
+
+    strcpy(injection_node, "fifo_in_");
+    strcat(injection_node, args[1]);
+
+    int injection_fd = open(injection_node, O_WRONLY);
+
+    exec = fork();
+    if (exec == 0) {      /*Aqui estaremos no processo filho, que irá executar um dado programa.*/
+      dup2(exec_com[1], 1);
+      if (!strcmp(args[2], "const") || !strcmp(args[2], "filter") || !strcmp(args[2], "window") || !strcmp(args[2], "spawn"))
+        execv(args[2], args+2);
+      else
+        execvp(args[2], args+2);
+    }
+    else if (exec > 0) {  /*Aqui estaremos no processo pai, que ficará de ler do pipe anónimo onde o filho escreverá.*/
+      while (br = read_line(exec_com[0], buffer, PIPE_BUF)) {
+        write(injection_fd, buffer, br);
+      }
     }
 }
 
@@ -122,22 +154,39 @@ int main(int argc, char const *argv[]) {
     /*printf("%d\n", nodes[28]);*/
     /*printf("%d\n", connections[28][28]);*/
 
+  	int config_file_fd = open("config", O_RDONLY);
 
-    /*----------------------------------NOTA: tem q ser STRCMP (...) == 0 nos ifs-----------------------------------*/
-    while (read_line(0, mainbuffer, PIPE_BUF) > 0) { /* AQUI É SÓ READ, pq a rede n pode parar só com um ficheiro*/
+    while (read_line(config_file_fd, mainbuffer, PIPE_BUF) > 0) { /* AQUI É SÓ READ, pq a rede n pode parar só com um ficheiro*/
       args = parse_cmd(mainbuffer);
-      if (strcmp(args[0], "node")) {
+      if (!strcmp(args[0], "node")) {
         node(args, nodes);
       }
-      else if (strcmp(args[0], "connect")) {
+      else if (!strcmp(args[0], "connect")) {
         for (i = 2; args[i]; i++) {
-          connect(args[1], args[i]);
+          connect(args[1], args[i], connections);
         }
       }
-      else if (strcmp(args[0], "disconnect")) {
+      else if (!strcmp(args[0], "disconnect")) {
         disconnect(args, connections);
       }
-      else if (strcmp(args[0], "inject")) {
+      else if (!strcmp(args[0], "inject")) {
+        inject(args);
+      }
+    }
+  	    while (read_line(0, mainbuffer, PIPE_BUF) > 0) { /* AQUI É SÓ READ, pq a rede n pode parar só com um ficheiro*/
+      args = parse_cmd(mainbuffer);
+      if (!strcmp(args[0], "node")) {
+        node(args, nodes);
+      }
+      else if (!strcmp(args[0], "connect")) {
+        for (i = 2; args[i]; i++) {
+          connect(args[1], args[i], connections);
+        }
+      }
+      else if (!strcmp(args[0], "disconnect")) {
+        disconnect(args, connections);
+      }
+      else if (!strcmp(args[0], "inject")) {
         inject(args);
       }
     }

@@ -14,62 +14,57 @@ argv[2]=operador
 argv[3]=coluna
 
 operadores: =, >=, <=, >, <, !=
-
-nota: em vez de ler 256, tamanho vai ser PIPE_BUF(1024)
-
 */
 
 //-----------------------------------------------------------------------------------
+
 int elemIndexInicial(char *buffer, int coluna){
-	int two_dots = 0, i;
-	int tam = strlen(buffer);
 
+		int two_dots = 0, i;
+		int tam = strlen(buffer);
 
-	for( i = 0; i < tam && (two_dots < (coluna-1) ) ; i++){
+		for(i = 0; i < tam && two_dots < (coluna-1); i++) {
+			if(buffer[i] == ':')
+				two_dots++;
+		}
 
-		if(buffer[i] == ':')
-			two_dots++;
-	}
-
-	return (i == tam) ? -1 : i;
+		return (i == tam) ? -1 : i;
 }
 
 //------------------------------------------------------------------------------------
 
 /*
-
-Função que dado o indice da coluna pedida, dá o elemento que queremos
-para depois comparar
-
-*/
+ *Função que dado o índice da coluna pedida, dá o elemento que queremos para depois comparar.
+ */
 int elem_column(char *buffer, int tamanho, int index){
 
-	int first_index = elemIndexInicial(buffer, index);
-	char guarda_elem[PIPE_BUF];
-	int i = 0;
+		int first_index = elemIndexInicial(buffer, index);
+		int i = 0;
+		int elemfinal;
+		char guarda_elem[PIPE_BUF];
 
-	if(first_index == -1)
-		return -1;
+		if(first_index == -1)
+			return -1;
 
-	while( buffer[first_index]!=':'  &&  buffer[first_index]!='\n'  &&  buffer[first_index]!='\0' ){
+		while (buffer[first_index] != ':' && buffer[first_index] != '\n' && buffer[first_index] != '\0') {
+			guarda_elem[i] = buffer[first_index];
+			i++;
+			first_index++;
+		}
 
-		guarda_elem[i] = buffer[first_index];
-		i++;
-		first_index++;
-	}
+		guarda_elem[i]='\0';
+		elemfinal = atoi(guarda_elem);
 
-	guarda_elem[i]='\0';
-
-	int elemfinal = atoi(guarda_elem);
-	return elemfinal;
+		return elemfinal;
 }
 
 //-------------------------------------------------------------------------------------
 
 int main(int argc, char** argv){
-char buffer[PIPE_BUF];
 
-	if(argc == 4){
+		char buffer[PIPE_BUF];
+
+		if (argc == 4) {
 		int tamanho;
 		int index_col1= atoi(argv[1]);
 		int index_col2= atoi(argv[3]);
@@ -135,7 +130,7 @@ char buffer[PIPE_BUF];
 					if(elem1 != elem2)
 						write(1, buffer, tamanho);
 				}
-				
+
 				}
 			}
 

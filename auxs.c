@@ -2,9 +2,10 @@
 #include <unistd.h>
 #include <string.h>
 #include "auxs.h"
+
 /**
- * Lê uma linha do file descriptor 'fd' para o buffer de caracteres 'buf' até ao tamanho máximo 'count'(corresponderá a PIPE_BUF).
- */
+  * Lê uma linha do file descriptor 'fd' para o buffer de caracteres 'buf' até ao tamanho máximo 'count'(corresponderá a PIPE_BUF).
+  */
 int read_line(int fd, char *buf, int count) {
 
     int endOfLine = 0, nbytes = 0;

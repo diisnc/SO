@@ -5,10 +5,10 @@
 #include <string.h>
 #include <limits.h>
 #include "auxs.h"
+
 /*
 argv[0] = const
 argv[1] = valor
-nota: em vez de ler 256, tamanho vai ser PIPE_BUF
 */
 
 int main(int argc, char** argv){
@@ -17,23 +17,17 @@ int main(int argc, char** argv){
 		char buffer[PIPE_BUF];
 
 		if (argc == 2) {
-
-			while (((x = read_line(0,buffer,PIPE_BUF)) > 0)) {
-
-				if(argc == 2){
-
-				strcpy(&buffer[x-1], ":");
-				strcat(buffer, argv[1]);
-				strcat(buffer, "\n");
-
-				write(1,buffer,strlen(buffer));
+			while (x = read_line(0,buffer,PIPE_BUF) > 0) {
+				if (argc == 2) {
+					strcpy(&buffer[x-1], ":");
+					strcat(buffer, argv[1]);
+					strcat(buffer, "\n");
+					write(1,buffer,strlen(buffer));
 				}
 			}
 		}
-
-		else {
+		else
 			write(1, "Too many or very few arguments!\n", 32);
-		}
 
 		return EXIT_SUCCESS;
 }

@@ -12,14 +12,14 @@ int getVal(char *line, int coluna, long *val){
     int size = strlen(line);
     char saved_elem[21];   /*20 dígitos do maior unsigned int representável em 64 bits mais 1 do \0.*/
 
-    for (idx = 0; idx < size && (two_dots < (coluna-1)); idx++)
+    for (idx = 0; idx < size && two_dots < (coluna-1); idx++)
       if(line[idx] == ':')
         two_dots++;
 
     if (idx == size)
       reachEnd = 1;
     else {
-      for (i = 0; line[idx]!=':' && line[idx]!='\n' && line[idx]!='\0'; idx++, i++)
+      for (i = 0; line[idx] != ':' && line[idx] != '\n' && line[idx] != '\0'; idx++, i++)
         saved_elem[i] = line[idx];
       saved_elem[i] = '\0';
       (*val) = atol(saved_elem);
@@ -55,7 +55,7 @@ int countDigits(long n){
     }
 
     while(n != 0) {
-      n /= 10;    // n = n/10
+      n /= 10;      // n = n/10
       count++;
     }
 
@@ -117,26 +117,24 @@ int main(int argc, const char *argv[]) {
     char buf[PIPE_BUF];
     long stack[nlines];
 
-  if (argc != 4) {
+    if (argc != 4) {
       write(1, "Too many or not enough arguments passed to the program.\n", 56);
-  }
+    }
 
-  else if (!checkOP(operation)) {
-            write(1, "Operation not supported by this program. Try 'avg', 'max', 'min' or 'sum'.\n", 75);
-        }
-    
-      else {
-        while (x = read_line(0, buf, PIPE_BUF)) {
+    else if (!checkOP(operation)) {
+      write(1, "Operation not supported by this program. Try 'avg', 'max', 'min' or 'sum'.\n", 75);
+    }
+
+    else {
+      while (x = read_line(0, buf, PIPE_BUF)) {
         res = operate(stack, i, operation);
-
         ins = getVal(buf, ncol, &valCol);
         if (ins >= 0)
           i = stackOrg(stack, i, nlines, valCol);
-
         sprintf(buf+x-1, ":%ld\n", res);
         write(1, buf, strlen(buf));
         }
-      }
+    }
 
-  return EXIT_SUCCESS;
+    return EXIT_SUCCESS;
 }
