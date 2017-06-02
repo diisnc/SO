@@ -82,10 +82,11 @@ int main(int argc, char **argv)
             result = WEXITSTATUS(exitStatus);
         }
 
-        char* res = concat(buffer,":0");
-        //res = concat(res,result);
+        strcat(buffer,":");
+        char c = result;
+        strcat(buffer,c);
 
-        write(1, res, strlen(res));
+        write(1, buffer, strlen(buffer));
     }
 
     //printf("yyy3\n");
