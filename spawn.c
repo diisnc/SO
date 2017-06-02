@@ -77,17 +77,17 @@ int main(int argc, char **argv)
             exit(x);
         }
         int exitStatus;
-        char* result;
+        int result;
         while (wait(&exitStatus) > 0) {
-            result = "%d", WEXITSTATUS(exitStatus);
+            result = WEXITSTATUS(exitStatus);
         }
 
-        char* res = concat(buffer,":");
-        res = concat(res,result);
+        char* res = concat(buffer,":0");
+        //res = concat(res,result);
 
         write(1, res, strlen(res));
     }
 
-    printf("yyy3\n");
+    //printf("yyy3\n");
     return EXIT_SUCCESS;
 }
