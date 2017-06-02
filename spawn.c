@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
+#include "auxs.h"
 
 int elemIndexInicial(char *buffer, int coluna){
     int two_dots = 0, i;

@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
-
+#include "auxs.h"
 /**
  * Lê uma linha do file descriptor 'fd' para o buffer de caracteres 'buf' até ao tamanho máximo 'count'(corresponderá a PIPE_BUF).
  */

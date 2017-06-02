@@ -19,13 +19,7 @@ nota: em vez de ler 256, tamanho vai ser PIPE_BUF(1024)
 
 */
 
-//------------------------------------------------------------------------------------
-
-/*
-
-Função que dá o indice da coluna pedida(1º indice)
-
-*/
+//-----------------------------------------------------------------------------------
 int elemIndexInicial(char *buffer, int coluna){
 	int two_dots = 0, i;
 	int tam = strlen(buffer);
@@ -75,7 +69,7 @@ int elem_column(char *buffer, int tamanho, int index){
 int main(int argc, char** argv){
 char buffer[PIPE_BUF];
 
-	//if(argc == 4){
+	if(argc == 4){
 		int tamanho;
 		int index_col1= atoi(argv[1]);
 		int index_col2= atoi(argv[3]);
@@ -83,81 +77,73 @@ char buffer[PIPE_BUF];
 
 
 
-		//if( index_col1 <=0 || index_col2 <= 0 ){
-		//	write(1, "Columns numbers can't be zero or less!\n", 38);
-		//	return EXIT_FAILURE;
-		//}
-
-
-		//if( (strcmp(op, "<")!=0) && (strcmp(op, ">")!=0) && (strcmp(op, "<=")!=0) && (strcmp(op, ">=")!=0) && (strcmp(op, "=")!=0) && (strcmp(op, "!=")!=0) ){
-		//	write(1, "Invalid operator!\n", 18);
-		//	return EXIT_FAILURE;
-		//}
-
-
-
-		while( (( tamanho = read_line(0, buffer, PIPE_BUF)) > 0)){
-			int elem1 = elem_column(buffer, tamanho, index_col1); //conteudo coluna argv[1]
-			int elem2 = elem_column(buffer, tamanho, index_col2); //conteudo coluna argv[3]
-
-			//if(elem1 == -1 || elem2 == -1){
-			//	write(1, "There are less columns in the input than the ones you entered initially.\n", 73);
-			//	return EXIT_FAILURE;
-			//}
-
-
-
-			//a ação começa aqui, até aqui foram quase só verificações
-
-
-			if(!strcmp(op, "<")){
-
-				if(elem1 < elem2)
-					write(1, buffer, tamanho);
-			}
-
-
-			if(!strcmp(op, ">")){
-
-				if(elem1 > elem2)
-					write(1, buffer, tamanho);
-			}
-
-
-			if(!strcmp(op, "<=")){
-
-				if(elem1 <= elem2)
-					write(1, buffer, tamanho);
-			}
-
-
-			if(!strcmp(op, ">=")){
-
-				if(elem1 >= elem2)
-					write(1, buffer, tamanho);
-			}
-
-
-			if(!strcmp(op, "=")){
-
-				if(elem1 == elem2)
-					write(1, buffer, tamanho);
-			}
-
-
-			if(!strcmp(op, "!=")){
-
-				if(elem1 != elem2)
-					write(1, buffer, tamanho);
-			}
+		if( index_col1 <=0 || index_col2 <= 0 ){
+			write(1, "Columns numbers can't be zero or less!\n", 39);
 		}
 
-	//}
 
-	//else{
-	//	write(1, "Too many or very few arguments!\n", 32);
-	//	return EXIT_FAILURE;
-	//}
+		else if( (strcmp(op, "<")!=0) && (strcmp(op, ">")!=0) && (strcmp(op, "<=")!=0) && (strcmp(op, ">=")!=0) && (strcmp(op, "=")!=0) && (strcmp(op, "!=")!=0) ){
+			write(1, "Invalid operator!\n", 18);
+		}
+
+
+
+		else { 	while( (( tamanho = read_line(0, buffer, PIPE_BUF)) > 0)){
+				int elem1 = elem_column(buffer, tamanho, index_col1); //conteudo coluna argv[1]
+				int elem2 = elem_column(buffer, tamanho, index_col2); //conteudo coluna argv[3]
+
+				//a ação começa aqui, até aqui foram quase só verificações
+
+
+				if(!strcmp(op, "<")){
+
+					if(elem1 < elem2)
+						write(1, buffer, tamanho);
+				}
+
+
+				if(!strcmp(op, ">")){
+
+					if(elem1 > elem2)
+						write(1, buffer, tamanho);
+				}
+
+
+				if(!strcmp(op, "<=")){
+
+					if(elem1 <= elem2)
+						write(1, buffer, tamanho);
+				}
+
+
+				if(!strcmp(op, ">=")){
+
+					if(elem1 >= elem2)
+						write(1, buffer, tamanho);
+				}
+
+
+				if(!strcmp(op, "=")){
+
+					if(elem1 == elem2)
+						write(1, buffer, tamanho);
+				}
+
+
+				if(!strcmp(op, "!=")){
+
+					if(elem1 != elem2)
+						write(1, buffer, tamanho);
+				}
+				
+				}
+			}
+
+	}
+
+	else{
+		write(1, "Too many or very few arguments!\n", 32);
+	}
 
 
 

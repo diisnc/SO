@@ -124,7 +124,7 @@ int main(int argc, char const *argv[]) {
 
 
     /*----------------------------------NOTA: tem q ser STRCMP (...) == 0 nos ifs-----------------------------------*/
-    while (read_line(0, mainbuffer, PIPE_BUF) > 0) {
+    while (read_line(0, mainbuffer, PIPE_BUF) > 0) { /* AQUI É SÓ READ, pq a rede n pode parar só com um ficheiro*/
       args = parse_cmd(mainbuffer);
       if (strcmp(args[0], "node")) {
         node(args, nodes);
