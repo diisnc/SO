@@ -34,6 +34,7 @@ Depois de algum tempo e trabalho, o resultado encontrado foi eficiente e satisfa
 \par Em suma, a Secção ~\ref{sec:2} descreve o problema a resolver, enquanto que a Secção ~\ref{sec:3} apresenta e discute a solução proposta pelo grupo, desenvolvida ao longo do semestre. O relatório termina com conclusões na  Secção ~\ref{sec:4}, onde é apresentada uma análise crítica dos resultados obtidos. Além disso, é feito um balanço tendo em conta as dificuldades ao longo do desenvolvimento do projeto.
 
 
+
 \section{Descrição do Problema}
 \label{sec:2}
 
@@ -43,6 +44,7 @@ Depois de algum tempo e trabalho, o resultado encontrado foi eficiente e satisfa
 \par Já a terceira tarefa envolveu mais trabalho, dado que foi necessário implementar todo um controlador da maneira mais eficiente, para resolver os requisitos do enunciado e testar se estariam a funcionar corretamente.
 
 
+
 \section{Concepção da Solução}
 \label{sec:3}
 
@@ -50,15 +52,30 @@ Depois de algum tempo e trabalho, o resultado encontrado foi eficiente e satisfa
 \par Procurou-se assim obter uma linha de trabalho clara, eficaz e que permitisse obter os resultados expectáveis.
 
 
-\subsection{Estruturas de Dados} (----------falta isto--------------)
+
+\subsection{Estruturas de Dados} 
 \label{sec:4}
 
+\hspace{3mm} Dada a natureza deste projeto, e tendo em conta a implementação sugerida em grupo, não foram necessárias quaisquer estruturas de dados, não tendo estas impacto quer na eficiência, quer na resolução dos problemas. 
 
 
 
-\subsection{Implementação}(-----------falta isto-----------------)
+\subsection{Implementação}
 \label{sec:5}
 
+\hspace{3mm} Ao longo do projeto, as dificuldades encontradas foram bastantes e diversificadas.
+Dado como clarificada a questão das estruturas de dados e quais as tarefas do projeto, resta falar da implementação das tarefas em si, necessários para a resolução do projeto. 
+\par Numa primeira instância, e como já fora referido, foi necessária a resolução das componentes. Entre elas, a "const" foi a de resolução mais simples e rápida, uma vez que se baseava "apenas" em acrescentar uma nova coluna, com um valor fornecido como argumento, a todas as linhas do input. Assim sendo, foi necessário ler o input, guardar num \emph{buffer}, e através de funções como "strcpy()" e "strcat()" foi acrescentado o pretendido, e de seguida reproduzido de novo o input.
+No que toca à filter, a dificuldade já foi um pouco mais acrescida, dado que incluía fazer uma espécie de "parse" a todo o input, e verificar se o conteúdo de uma dada coluna era inferior (entre outras opções) ao de outra. Através das funções auxiliares "elem_column()" e "elemIndexInicial()" foi permitido localizar a coluna pretendida e extrair os números, para depois, na função principal, serem escritos para o output caso cumprissem o requisito.
+Já na função window, era necessário reproduzir todas as linhas, acrescentando uma nova coluna com o resultado de uma operação (média, máximo, mínimo ou suma) calculada sobre os valores da coluna indicada nas linhas ateriores. Mais uma vez, foi preciso fazer "parse" ao input e codificar as operações possíveis.
+Por fim, a spawn era de cariz idêntico, mas desta vez era para executar um comando especificado e acrescentar no final de cada linha do input o \emph{exit status}. Também aqui foram usadas funções auxiliares no "parse" do input.
+\par Mudando de tema, agora para o controlador, foi necessária uma discução e reflexão acerca da melhor estrutura para a rede.
+Assim, o primeiro comando - node - envolveu bastante tempo e planeamento por parte dos elementos do grupo. Foi decidido que cada nó da rede de processamento incluiria três processos principais: um para ler, outro para executar a componente, e outro para escrever. O "pai"(processo principal) nada mais faz do que guardar registo dos nodos criados e o "filho" é responsável por criar os três processos "netos" principais e os pipes necessários. Nos "netos", o de leitura recebe informação por um pipe com nome e envia por um pipe anónimo ao "neto" responsável pela execução. Este "neto" executa e envia ao processo de escrita o resultado da execução por um pipe anónimo. O "neto" da escrita escreve através de um pipe com nome. O fluxo de informação passará a ser, então : pipe de entrada do processo de leitura -> processo de leitura -> pipe anónimo (de entrada) do processo de execução -> processo de execução -> pipe anónimo (de saída) do processo de execução -> processo de escrita -> pipe de saída do processo de escrita. Todo este sistema permite uma permanência da rede e um fluxo de escrita constante e eficaz, e a rede vai sendo construída ao longo do tempo e da inserção de nós.
+O segundo comando - connect - foi mais simples de implementar, embora exigisse também perspicácia para manter a eficiência e simplicidade do código. Deste modo, decidiu-se que a conecção entre dois nós ou mais seria efetuada por um pipe (com nome). Todas as escritas ou leituras entre dois nós sucessivos passariam por um pipe, e, como a escrita é atómica, não haveria o problema da mistura de escritas. Existe um registo interno no programa de todas as ligações atuais entre nós e que permite manipular e conectar os nós pretendidos.
+Para o terceiro comando - inject - 
+
+(+ disconnect e inject)
+(+ falar das auxs (breve))
 
 \section{Conclusões}
 \label{sec:6}
