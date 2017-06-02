@@ -90,10 +90,11 @@ int main(int argc, char **argv)
         //printf("666666666\n");
         i=0;
         //chat argv2[100][100];
+        /*
         while(i<argc){
             printf("%s ",argv[i]);
             i++;
-        }
+        }*/
         printf("\n");
         //int r;
         int x;
