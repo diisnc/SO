@@ -72,10 +72,13 @@ Por fim, a spawn era de cariz idêntico, mas desta vez era para executar um coma
 \par Mudando de tema, agora para o controlador, foi necessária uma discução e reflexão acerca da melhor estrutura para a rede.
 Assim, o primeiro comando - node - envolveu bastante tempo e planeamento por parte dos elementos do grupo. Foi decidido que cada nó da rede de processamento incluiria três processos principais: um para ler, outro para executar a componente, e outro para escrever. O "pai"(processo principal) nada mais faz do que guardar registo dos nodos criados e o "filho" é responsável por criar os três processos "netos" principais e os pipes necessários. Nos "netos", o de leitura recebe informação por um pipe com nome e envia por um pipe anónimo ao "neto" responsável pela execução. Este "neto" executa e envia ao processo de escrita o resultado da execução por um pipe anónimo. O "neto" da escrita escreve através de um pipe com nome. O fluxo de informação passará a ser, então : pipe de entrada do processo de leitura -> processo de leitura -> pipe anónimo (de entrada) do processo de execução -> processo de execução -> pipe anónimo (de saída) do processo de execução -> processo de escrita -> pipe de saída do processo de escrita. Todo este sistema permite uma permanência da rede e um fluxo de escrita constante e eficaz, e a rede vai sendo construída ao longo do tempo e da inserção de nós.
 O segundo comando - connect - foi mais simples de implementar, embora exigisse também perspicácia para manter a eficiência e simplicidade do código. Deste modo, decidiu-se que a conecção entre dois nós ou mais seria efetuada por um pipe (com nome). Todas as escritas ou leituras entre dois nós sucessivos passariam por um pipe (existente num processo), e, como a escrita é atómica, não haveria o problema da mistura de escritas. Existe um registo interno no programa de todas as ligações atuais entre nós e que permite manipular e conectar os nós pretendidos.
-Para o terceiro comando - inject - 
+O objetivo do comando "oposto" - disconnect - seria desfazer a ligação entre dois nós, criada pelo connect. Ora, se o connect cria um processo, na disconnect procedeu-se (.............)
 
-(+ disconnect e inject)
-(+ falar das auxs (breve))
+Para o último comando - inject - (..............)
+
+\par Finalmente, para auxílio quer das componentes, quer do controlador em si, foi criado um header file "auxs" que permite usar a função "read_line()" implementada pelo grupo. Também neste ficheiro está a função "parse_cmd()" que permite, no controlador, fazer parse ao comando recebido, transformando uma \emph{string} numa \emph{string} de \emph{strings}.
+
+
 
 \section{Conclusões}
 \label{sec:6}
