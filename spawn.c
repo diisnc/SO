@@ -4,7 +4,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
-#include "auxs.h"
 
 int elemIndexInicial(char *buffer, int coluna){
     int two_dots = 0, i;
@@ -52,7 +51,7 @@ int main(int argc, char **argv)
     int j=0;
     int k;
     int tamanho;
-    int index_col;//= atoi(argv[1]);
+    //int index_col;//= atoi(argv[1]);
     //printf("yyy1\n");
     //printf("%s ",argv[1]);
     while(i<argc){
@@ -88,14 +87,14 @@ int main(int argc, char **argv)
             i++;
         }
         printf("\n");
-        int r;
+        //int r;
         int x;
         if((x=fork())==0){
             x = execvp(argv[1],&argv[1]);
             exit(x);
         }
 
-        write(1,buffer,WEXITSTATUS(r));
+        write(1,buffer,WEXITSTATUS(x));
 
     }
 
