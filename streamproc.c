@@ -122,6 +122,8 @@ int main(int argc, char const *argv[]) {
     /*printf("%d\n", nodes[28]);*/
     /*printf("%d\n", connections[28][28]);*/
 
+
+    /*----------------------------------NOTA: tem q ser STRCMP (...) == 0 nos ifs-----------------------------------*/
     while (read_line(0, mainbuffer, PIPE_BUF) > 0) {
       args = parse_cmd(mainbuffer);
       if (strcmp(args[0], "node")) {
