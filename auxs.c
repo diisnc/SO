@@ -3,7 +3,7 @@
 #include <string.h>
 
 /**
- * Lê uma linha até ao tamanho máximo 'count'(corresponderá a PIPE_BUF).
+ * Lê uma linha do file descriptor 'fd' para o buffer de caracteres 'buf' até ao tamanho máximo 'count'(corresponderá a PIPE_BUF).
  */
 int read_line(int fd, char *buf, int count) {
 
