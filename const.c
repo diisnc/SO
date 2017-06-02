@@ -17,11 +17,9 @@ int main(int argc, char** argv){
 		char buffer[PIPE_BUF];
 
 		if (argc == 2) {
-			while (x = read_line(0,buffer,PIPE_BUF) > 0) {
+			while ((x = read_line(0,buffer,PIPE_BUF)) > 0) {
 				if (argc == 2) {
-					strcpy(&buffer[x-1], ":");
-					strcat(buffer, argv[1]);
-					strcat(buffer, "\n");
+					sprintf(buffer+x-1, ":%s\n", argv[1]);
 					write(1,buffer,strlen(buffer));
 				}
 			}

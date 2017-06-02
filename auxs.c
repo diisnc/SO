@@ -35,7 +35,9 @@ char** parse_cmd(char *buffer) {
  	  while (buffer[i] != '\n') {
  		  for (j = 0; buffer[i] > 32; j++, i++)     /*buffer[i] ser maior que 32 significa que o caracter não é um caracter de controlo, ou seja, não é espaço (32), nem newline (12).*/
  		    auxword[j] = buffer[i];                 /*A palavra no buffer é copiada para um array estático auxiliar.*/
- 	    auxword[j] = '\0';                        /*A palavra é dada como terminada ao ser encontrado um caracter com código <= 32.*/
+      if (buffer[i] == 32)
+        i++;
+      auxword[j] = '\0';                        /*A palavra é dada como terminada ao ser encontrado um caracter com código <= 32.*/
       word = strdup(auxword);                   /*A palavra é copiada para espaço alocado na memória.*/
       words[k] = word;                          /*É guardado o endereço da palavra no array de palavras.*/
  	    k++;                                      /*É incrementado o índice no array de palavras guardadas.*/

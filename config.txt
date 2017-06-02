@@ -1,0 +1,4 @@
+node 1 const cooling
+node 2 const 10
+node 3 const 20
+connect 1 2 3

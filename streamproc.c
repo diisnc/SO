@@ -26,7 +26,7 @@ void node(char** args, pid_t nodes[]) {
     pipe(feed_exec_fd);
     pipe(out_exec_fd);
     char rd_wr_buf[PIPE_BUF];
-    /*int err;*/
+    //int err;
 
     strcpy(in_node, "fifo_in_");
     strcat(in_node, args[1]);
@@ -36,17 +36,15 @@ void node(char** args, pid_t nodes[]) {
     strcat(out_node, args[1]);
     /*printf("%s\n", out_node);*/
 
-    mkfifo(in_node, 0660);
-    mkfifo(out_node, 0660);
-
-    fd_rd_in = open(in_node, O_RDONLY);    		 /*Abre o named pipe de entrada para leitura.*/
-    fd_wr_out = open(out_node, O_WRONLY);  		 /*Abre o named pipe de saída para escrita.*/
+    mkfifo(in_node, 0666);
+    mkfifo(out_node, 0666);
 
     node_proc = fork();                                                /*Criação de um filho do processo principal, que será o processo correspondente ao nodo.*/
-    if (node_proc == 0) {                                              /*Sendo 0, estamos no processo filho do nodo criado.*/
+    if (node_proc == 0) {                                               /*Sendo 0, estamos no processo filho do nodo criado.*/
       rd_proc = fork();                                                /*Criação de um processo de leitura dos dados que chegam ao node.*/
       if (rd_proc == 0) {                                           	 /*Sendo 0, estamos no processo filho de leitura criado.*/
-        while (br = read_line(fd_rd_in, rd_wr_buf, PIPE_BUF) >= 0) {   /*A leitura dá-se quando o número de bytes lidos é maior ou igual a 0 de modo a que a rede não pare.*/
+        fd_rd_in = open(in_node, O_RDONLY);    		 /*Abre o named pipe de entrada para leitura.*/
+        while ((br = read_line(fd_rd_in, rd_wr_buf, PIPE_BUF)) >= 0) {   /*A leitura dá-se quando o número de bytes lidos é maior ou igual a 0 de modo a que a rede não pare.*/
           if (br > 0)                                               	 /*Se for maior do que 0, estamos perante um evento, e dá-se uma execução.*/
             write(feed_exec_fd[1], rd_wr_buf, br);
         }
@@ -62,7 +60,8 @@ void node(char** args, pid_t nodes[]) {
             execvp(args[2], args+2);
         }
         else if (exec_proc > 0) {                             /*Sendo maior do que 0, estamos ainda no processo pai, correspondente ao processo do nodo.*/
-          while (br = read_line(out_exec_fd[0], rd_wr_buf, PIPE_BUF) > 0)
+          fd_wr_out = open(out_node, O_WRONLY);  		 /*Abre o named pipe de saída para escrita.*/
+          while ((br = read_line(out_exec_fd[0], rd_wr_buf, PIPE_BUF)) > 0)
             write(fd_wr_out, rd_wr_buf, br);
         }
       }
@@ -85,13 +84,13 @@ void connect(char *out, char *in, pid_t connections[512][512]) {
     strcpy(in_node, "fifo_in_");
     strcat(in_node, in);
 
-    int fd_rd_out = open(out_node, O_RDONLY);  /*Abre o named pipe de saída para leitura.*/
-    int fd_wr_in = open(in_node, O_WRONLY);    /*Abre o named pipe de entrada para escrita.*/
 
     connection = fork();
     if (connection == 0) {  /*Estamos no processo filho, que será responsável por criar uma ligação entre nodos.*/
+      int fd_rd_out = open(out_node, O_RDONLY);  /*Abre o named pipe de saída para leitura.*/
+      int fd_wr_in = open(in_node, O_WRONLY);    /*Abre o named pipe de entrada para escrita.*/
 
-      while (br = read_line(fd_rd_out, connection_buffer, PIPE_BUF) > 0) {
+      while ((br = read_line(fd_rd_out, connection_buffer, PIPE_BUF)) > 0) {
         write(fd_wr_in, connection_buffer, br);
       }
     }
@@ -136,7 +135,7 @@ void inject(char** args) {
         execvp(args[2], args+2);
     }
     else if (exec > 0) {  /*Aqui estaremos no processo pai, que ficará de ler do pipe anónimo onde o filho escreverá.*/
-      while (br = read_line(exec_com[0], buffer, PIPE_BUF)) {
+      while ((br = read_line(exec_com[0], buffer, PIPE_BUF)) > 0) {
         write(injection_fd, buffer, br);
       }
     }
@@ -154,41 +153,36 @@ int main(int argc, char const *argv[]) {
     /*printf("%d\n", nodes[28]);*/
     /*printf("%d\n", connections[28][28]);*/
 
-  	int config_file_fd = open("config", O_RDONLY);
+  	int config_file_fd = open("config.txt", O_RDONLY);
 
-    while (read_line(config_file_fd, mainbuffer, PIPE_BUF) > 0) { /* AQUI É SÓ READ, pq a rede n pode parar só com um ficheiro*/
+    while (read_line(config_file_fd, mainbuffer, PIPE_BUF) > 0) {
       args = parse_cmd(mainbuffer);
-      if (!strcmp(args[0], "node")) {
+      if (!strcmp(args[0], "node"))
         node(args, nodes);
-      }
       else if (!strcmp(args[0], "connect")) {
         for (i = 2; args[i]; i++) {
           connect(args[1], args[i], connections);
         }
       }
-      else if (!strcmp(args[0], "disconnect")) {
+      else if (!strcmp(args[0], "disconnect"))
         disconnect(args, connections);
-      }
-      else if (!strcmp(args[0], "inject")) {
+      else if (!strcmp(args[0], "inject"))
         inject(args);
-      }
     }
-  	    while (read_line(0, mainbuffer, PIPE_BUF) > 0) { /* AQUI É SÓ READ, pq a rede n pode parar só com um ficheiro*/
+
+    while (read_line(0, mainbuffer, PIPE_BUF) > 0) {
       args = parse_cmd(mainbuffer);
-      if (!strcmp(args[0], "node")) {
+      if (!strcmp(args[0], "node"))
         node(args, nodes);
-      }
       else if (!strcmp(args[0], "connect")) {
         for (i = 2; args[i]; i++) {
           connect(args[1], args[i], connections);
         }
       }
-      else if (!strcmp(args[0], "disconnect")) {
+      else if (!strcmp(args[0], "disconnect"))
         disconnect(args, connections);
-      }
-      else if (!strcmp(args[0], "inject")) {
+      else if (!strcmp(args[0], "inject"))
         inject(args);
-      }
     }
 
     return 0;
