@@ -38,6 +38,8 @@ int main(int argc, char **argv) {
   	int argsCol[argc];
   	char *args[argc];					//argc para incluir o NULL no final
   	int status;
+    int pipefd[2];
+    pipe(pipefd);
 
     for (i = 1; i < argc; i++) {
       args[i-1] = argv[i];
@@ -53,8 +55,10 @@ int main(int argc, char **argv) {
         if (argsCol[i])
         	args[i] = getVal(buf, argsCol[i]);
       exec_proc = fork();
-      if (exec_proc == 0)
-      	execvp(args[0], args);
+      if (exec_proc == 0) {
+        dup(pipefd[1], 1);
+        execvp(args[0], args);
+      }
       else {
       	wait(&status);
         sprintf(buf+br-1, ":%d\n", WEXITSTATUS(status));
