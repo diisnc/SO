@@ -4,91 +4,62 @@
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
+#include "auxs.h"
 
+char* getVal(char *line, int coluna) {
 
-int elemIndexInicial(char *buffer, int coluna){
-    int two_dots = 0, i;
-    int tam = strlen(buffer);
+    int two_dots = 0, reachEnd = 0, idx = 0, i;
+    int size = strlen(line);
+    char saved_elem[28];
+    char *colElem;
 
-    for( i = 0; i < tam && (two_dots < (coluna-1) ) ; i++){
-        if(buffer[i] == ':') 
-            two_dots++;
+    for (idx = 0; idx < size && two_dots < (coluna-1); idx++)
+      if(line[idx] == ':')
+        two_dots++;
+
+    if (idx == size)
+      reachEnd = 1;
+    else {
+      for (i = 0; line[idx] != ':' && line[idx] != '\n' && line[idx] != '\0'; idx++, i++)
+        saved_elem[i] = line[idx];
+      saved_elem[i] = '\0';
+      colElem = strdup(saved_elem);
     }
 
-    return (i == tam) ? -1 : i;
+    return (reachEnd) ? NULL : colElem;
 }
 
-char* elem_column(char *buffer, int tamanho, int index){
-    int first_index = elemIndexInicial(buffer, index);
-    char guarda_elem[256];
-    int i = 0;
-    while( buffer[first_index]!=':'  &&  buffer[first_index]!='\n'  &&  buffer[first_index]!='\0' ){
-        guarda_elem[i] = buffer[first_index];
-        i++;
-        first_index++;
+int main(int argc, char **argv) {
+
+    int i;
+  	ssize_t br;
+  	pid_t exec_proc;
+    char buf[PIPE_BUF];
+  	int argsCol[argc];
+  	char *args[argc];					//argc para incluir o NULL no final
+  	int status;
+
+    for (i = 1; i < argc; i++) {
+      args[i-1] = argv[i];
+      if (argv[i][0] == '$')
+        argsCol[i-1] = atoi(argv[i]+1);
+      else
+        argsCol[i-1] = 0;
     }
+  	args[i] = NULL;
 
-    guarda_elem[i]='\0';
-    return strdup(guarda_elem);
-}
+  	while (br = read_line(0, buf, PIPE_BUF) > 0) {
+      for (i = 0; i < argc; i++)
+        if (argsCol[i])
+        	args[i] = getVal(buf, argsCol[i]);
+      exec_proc = fork();
+      if (exec_proc == 0)
+      	execvp(args[0], args);
+      else {
+      	wait(&status);
+        sprintf(buf+br-1, ":%d\n", WEXITSTATUS(status));
+				write(1, buf, strlen(buf));
+    	}
+  	}
 
-char* concat(const char *s1, const char *s2)
-{
-    char *result =(char*) malloc(strlen(s1)+strlen(s2)+1);
-
-    strcpy(result, s1);
-    strcat(result, s2);
-    return result;
-}
-
-int main(int argc, char **argv)
-{
-    char buffer[256];
-    int ins[100];
-    char args[100][100];
-    int i=1;
-    int j=0;
-    int k;
-    int tamanho;
-
-    while(i<argc){
-        if(argv[i][0]=='$'){ins[j]=atoi(argv[i]+1);j++;}
-        i++;
-    }
-    while((( tamanho = read(0,buffer,256)) > 0)){
-        i=0;
-        while(i<j){
-            char* elem = elem_column(buffer, tamanho, ins[i]); //conteudo coluna argv[1]
-            strcpy(args[i],elem);
-            i++;
-        }
-        i=0;
-        k=0;
-        while(i<argc){
-            if(argv[i][0]=='$'){argv[i]=args[k++];}
-            i++;
-        }
-        i=0;
-        printf("\n");
-        int x;
-        char* output = (char*) malloc(256);
-        if((x=fork())==0){
-            x = execvp(argv[1],&argv[1]);
-            exit(x);
-        }
-        int exitStatus;
-        int result;
-        while (wait(&exitStatus) > 0) {
-            result = WEXITSTATUS(exitStatus);
-        }
-
-        strcat(buffer,":");
-        char c = result;
-        strcat(buffer,c);
-
-        write(1, buffer, strlen(buffer));
-    }
-
-    //printf("yyy3\n");
-    return EXIT_SUCCESS;
 }
