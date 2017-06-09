@@ -56,7 +56,7 @@ int main(int argc, char **argv) {
         	args[i] = getVal(buf, argsCol[i]);
       exec_proc = fork();
       if (exec_proc == 0) {
-        dup(pipefd[1], 1);
+        dup2(pipefd[1], 1);
         execvp(args[0], args);
       }
       else {
